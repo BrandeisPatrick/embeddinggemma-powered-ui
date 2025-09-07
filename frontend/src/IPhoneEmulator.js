@@ -4,18 +4,38 @@ import IOSStatusBar from './IOSStatusBar';
 import IOSTabBar from './IOSTabBar';
 import IMessageApp from './IMessageApp';
 import GmailApp from './GmailApp';
+import HomeScreen from './HomeScreen';
 
 function IPhoneEmulator({ systemResources }) {
-  const [activeApp, setActiveApp] = useState('messages');
+  const [activeApp, setActiveApp] = useState('home');
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const handleAppLaunch = (appId) => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setActiveApp(appId);
+      setIsTransitioning(false);
+    }, 200);
+  };
+
+  const handleHomePress = () => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setActiveApp('home');
+      setIsTransitioning(false);
+    }, 200);
+  };
 
   const renderActiveApp = () => {
     switch (activeApp) {
+      case 'home':
+        return <HomeScreen onAppLaunch={handleAppLaunch} />;
       case 'messages':
         return <IMessageApp systemResources={systemResources} />;
       case 'mail':
         return <GmailApp />;
       default:
-        return <IMessageApp systemResources={systemResources} />;
+        return <HomeScreen onAppLaunch={handleAppLaunch} />;
     }
   };
 
@@ -49,12 +69,25 @@ function IPhoneEmulator({ systemResources }) {
         <IOSStatusBar />
 
         {/* App Content */}
-        <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+        <Box 
+          sx={{ 
+            flex: 1, 
+            position: 'relative', 
+            overflow: 'hidden',
+            opacity: isTransitioning ? 0.8 : 1,
+            transform: isTransitioning ? 'scale(0.95)' : 'scale(1)',
+            transition: 'all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          }}
+        >
           {renderActiveApp()}
         </Box>
 
         {/* Tab Bar */}
-        <IOSTabBar activeApp={activeApp} onAppChange={setActiveApp} />
+        <IOSTabBar 
+          activeApp={activeApp} 
+          onAppChange={setActiveApp} 
+          onHomePress={handleHomePress} 
+        />
 
         {/* Home Indicator */}
         <Box

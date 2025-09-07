@@ -5,7 +5,7 @@ import IPhoneEmulator from './IPhoneEmulator';
 import ResourceDashboard from './ResourceDashboard';
 import './App.css';
 
-const socket = io('http://localhost:5000');
+const socket = io('http://localhost:5001');
 
 function App() {
   const [systemResources, setSystemResources] = useState(null);
