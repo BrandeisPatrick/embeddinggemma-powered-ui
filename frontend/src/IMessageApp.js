@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, TextField } from '@mui/material';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5001');
+// For Vercel deployment, use conditional socket connection
+const socket = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+  ? io('http://localhost:5001') 
+  : null;
 
 const emotionEmojis = {
   joy: '😊',
@@ -27,6 +30,33 @@ function IMessageApp({ systemResources }) {
   const typingTimeout = useRef(null);
 
   useEffect(() => {
+    if (!socket) {
+      // Demo messages for Vercel deployment
+      setMessages([
+        {
+          id: 1,
+          username: 'AI Assistant',
+          text: 'Hello! Welcome to the iOS-style Messages demo!',
+          timestamp: Date.now() - 60000,
+          emotion: { emotion: 'joy', confidence: 0.95 }
+        },
+        {
+          id: 2,
+          username: username,
+          text: 'This looks amazing! The UI is so smooth.',
+          timestamp: Date.now() - 30000
+        },
+        {
+          id: 3,
+          username: 'AI Assistant', 
+          text: 'Thank you! This is powered by EmbeddingGemma with authentic iOS styling, complete with message bubbles, animations, and circular progress bars.',
+          timestamp: Date.now() - 15000,
+          emotion: { emotion: 'excitement', confidence: 0.88 }
+        }
+      ]);
+      return;
+    }
+
     socket.emit('join', username);
 
     socket.on('previousMessages', (previousMessages) => {
@@ -72,10 +102,34 @@ function IMessageApp({ systemResources }) {
       
       // Animate send button
       setTimeout(() => {
-        socket.emit('message', {
-          username,
-          text: message
-        });
+        if (socket) {
+          socket.emit('message', {
+            username,
+            text: message
+          });
+        } else {
+          // Demo mode - add message locally
+          const newMessage = {
+            id: Date.now(),
+            username,
+            text: message,
+            timestamp: Date.now()
+          };
+          setMessages(prev => [...prev, newMessage]);
+          
+          // Simulate AI response after a delay
+          setTimeout(() => {
+            const aiResponse = {
+              id: Date.now() + 1,
+              username: 'AI Assistant',
+              text: `That's a great message! The iOS UI styling makes this feel just like the native Messages app.`,
+              timestamp: Date.now(),
+              emotion: { emotion: 'joy', confidence: 0.92 }
+            };
+            setMessages(prev => [...prev, aiResponse]);
+          }, 1500);
+        }
+        
         setMessage('');
         handleStopTyping();
         setSendingMessage(false);
@@ -84,19 +138,23 @@ function IMessageApp({ systemResources }) {
   };
 
   const handleTyping = () => {
-    socket.emit('typing', { username });
-    
-    if (typingTimeout.current) {
-      clearTimeout(typingTimeout.current);
+    if (socket) {
+      socket.emit('typing', { username });
+      
+      if (typingTimeout.current) {
+        clearTimeout(typingTimeout.current);
+      }
+      
+      typingTimeout.current = setTimeout(() => {
+        handleStopTyping();
+      }, 1000);
     }
-    
-    typingTimeout.current = setTimeout(() => {
-      handleStopTyping();
-    }, 1000);
   };
 
   const handleStopTyping = () => {
-    socket.emit('stopTyping', { username });
+    if (socket) {
+      socket.emit('stopTyping', { username });
+    }
     if (typingTimeout.current) {
       clearTimeout(typingTimeout.current);
     }

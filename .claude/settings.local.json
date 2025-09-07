@@ -15,7 +15,8 @@
       "Bash(pkill:*)",
       "Bash(lsof:*)",
       "Bash(kill:*)",
-      "Bash(PORT=5001 npm run server)"
+      "Bash(PORT=5001 npm run server)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
