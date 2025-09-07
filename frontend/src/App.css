@@ -1,0 +1,89 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #000000;
+  min-height: 100vh;
+  color: #FFFFFF;
+  overflow: hidden;
+}
+
+code {
+  font-family: 'SF Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}
+
+/* iPhone-style scrollbar in chat */
+.ios-scrollbar::-webkit-scrollbar {
+  width: 3px;
+}
+
+.ios-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ios-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+/* Remove Material-UI default styles */
+.MuiList-root {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.MuiListItem-root {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Custom focus styles for dark theme */
+.MuiOutlinedInput-root:focus-within {
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3) !important;
+}
+
+/* Smooth transitions */
+* {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prevent text selection on UI elements */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Add some iPhone-specific styling */
+@supports (-webkit-backdrop-filter: blur(20px)) {
+  .ios-blur {
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+  }
+}
