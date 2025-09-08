@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, TextField } from '@mui/material';
 import io from 'socket.io-client';
+import MessagesList from './MessagesList';
 
 // For Vercel deployment, use conditional socket connection
 const socket = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
@@ -26,34 +27,26 @@ function IMessageApp({ systemResources }) {
   const [messages, setMessages] = useState([]);
   const [typingUsers, setTypingUsers] = useState([]);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [currentView, setCurrentView] = useState('contacts'); // 'contacts' or 'conversation'
+  const [selectedConversation, setSelectedConversation] = useState(null);
   const messagesEndRef = useRef(null);
   const typingTimeout = useRef(null);
 
+  const handleSelectConversation = (conversation) => {
+    setSelectedConversation(conversation);
+    setMessages(conversation.messages || []);
+    setCurrentView('conversation');
+  };
+
+  const handleBackToContacts = () => {
+    setCurrentView('contacts');
+    setSelectedConversation(null);
+  };
+
   useEffect(() => {
     if (!socket) {
-      // Demo messages for Vercel deployment
-      setMessages([
-        {
-          id: 1,
-          username: 'AI Assistant',
-          text: 'Hello! Welcome to the iOS-style Messages demo!',
-          timestamp: Date.now() - 60000,
-          emotion: { emotion: 'joy', confidence: 0.95 }
-        },
-        {
-          id: 2,
-          username: username,
-          text: 'This looks amazing! The UI is so smooth.',
-          timestamp: Date.now() - 30000
-        },
-        {
-          id: 3,
-          username: 'AI Assistant', 
-          text: 'Thank you! This is powered by EmbeddingGemma with authentic iOS styling, complete with message bubbles, animations, and circular progress bars.',
-          timestamp: Date.now() - 15000,
-          emotion: { emotion: 'excitement', confidence: 0.88 }
-        }
-      ]);
+      // For demo mode, don't set default messages here
+      // Messages will be set when a conversation is selected
       return;
     }
 
@@ -197,6 +190,7 @@ function IMessageApp({ systemResources }) {
         >
           {/* Back Button */}
           <Box
+            onClick={handleBackToContacts}
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -239,7 +233,7 @@ function IMessageApp({ systemResources }) {
                 textAlign: 'center'
               }}
             >
-              AI Assistant
+              {selectedConversation ? selectedConversation.name : 'Messages'}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Box
@@ -278,51 +272,85 @@ function IMessageApp({ systemResources }) {
               justifyContent: 'flex-end'
             }}
           >
-            {/* FaceTime Video */}
-            <Box
-              sx={{
-                width: 28,
-                height: 28,
-                borderRadius: '50%',
-                backgroundColor: 'transparent',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: 'rgba(0,0,0,0.05)'
-                }
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="#007AFF">
-                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-              </svg>
-            </Box>
+            {currentView === 'conversation' && (
+              <>
+                {/* FaceTime Video */}
+                <Box
+                  onClick={() => alert(`Starting FaceTime call with ${selectedConversation?.name}`)}
+                  sx={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    backgroundColor: 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0,0,0,0.05)'
+                    }
+                  }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#007AFF">
+                    <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                  </svg>
+                </Box>
+                
+                {/* Phone */}
+                <Box
+                  onClick={() => alert(`Calling ${selectedConversation?.name}`)}
+                  sx={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    backgroundColor: 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0,0,0,0.05)'
+                    }
+                  }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#007AFF">
+                    <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
+                  </svg>
+                </Box>
+              </>
+            )}
             
-            {/* Phone */}
-            <Box
-              sx={{
-                width: 28,
-                height: 28,
-                borderRadius: '50%',
-                backgroundColor: 'transparent',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: 'rgba(0,0,0,0.05)'
-                }
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#007AFF">
-                <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
-              </svg>
-            </Box>
+            {currentView === 'contacts' && (
+              <Box
+                onClick={() => alert('Opening compose new message')}
+                sx={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: '50%',
+                  backgroundColor: 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0,0,0,0.05)'
+                  }
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#007AFF">
+                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                </svg>
+              </Box>
+            )}
           </Box>
         </Box>
       </Box>
 
+      {/* Content Area */}
+      {currentView === 'contacts' ? (
+        <MessagesList onSelectConversation={handleSelectConversation} />
+      ) : (
+        <>
       {/* Messages */}
       <Box
         sx={{
@@ -722,6 +750,8 @@ function IMessageApp({ systemResources }) {
           )}
         </Box>
       </Box>
+        </>
+      )}
     </Box>
   );
 }

@@ -16,7 +16,10 @@
       "Bash(lsof:*)",
       "Bash(kill:*)",
       "Bash(PORT=5001 npm run server)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npx vercel:*)",
+      "Read(//var/folders/z1/d00x39c93vgf5hj04v6w89mc0000gn/T/TemporaryItems/NSIRD_screencaptureui_Vj3V3b/**)"
     ],
     "deny": [],
     "ask": []
